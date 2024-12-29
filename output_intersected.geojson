@@ -1,0 +1,10 @@
+{
+"type": "FeatureCollection",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "title": "Track1_GroundSAR - AA1", "description": "TL within segment: 4514.52 (m) | 14811 (ft)\nTTL within segment: 22572.61 (m) | 74057 (ft)\nArea effectively searched: 790041.2924656543 (m) | 2591998.991018682 (ft)\nCoverage: 29.1%" }, "geometry": { "type": "LineString", "coordinates": [ [ -82.758746781944453, 35.372017290385983 ], [ -82.758929328163617, 35.36189472224406 ] ] } },
+{ "type": "Feature", "properties": { "title": "Track1_GroundSAR - AA2", "description": "TL within segment: 4514.52 (m) | 14811 (ft)\nTTL within segment: 22572.61 (m) | 74057 (ft)\nArea effectively searched: 790041.2924656543 (m) | 2591998.991018682 (ft)\nCoverage: 29.1%" }, "geometry": { "type": "LineString", "coordinates": [ [ -82.752386712232735, 35.361869018423214 ], [ -82.752444916390985, 35.372025771434323 ] ] } },
+{ "type": "Feature", "properties": { "title": "Track1_GroundSAR - AA3", "description": "TL within segment: 4514.52 (m) | 14811 (ft)\nTTL within segment: 22572.61 (m) | 74057 (ft)\nArea effectively searched: 790041.2924656543 (m) | 2591998.991018682 (ft)\nCoverage: 29.1%" }, "geometry": { "type": "LineString", "coordinates": [ [ -82.746217858987876, 35.372033828804547 ], [ -82.746402502267571, 35.361845198000594 ] ] } },
+{ "type": "Feature", "properties": { "title": "Track1_GroundSAR - AA4", "description": "TL within segment: 4514.52 (m) | 14811 (ft)\nTTL within segment: 22572.61 (m) | 74057 (ft)\nArea effectively searched: 790041.2924656543 (m) | 2591998.991018682 (ft)\nCoverage: 29.1%" }, "geometry": { "type": "LineString", "coordinates": [ [ -82.739693619982816, 35.361818140381928 ], [ -82.739795542855092, 35.372041802494351 ] ] } }
+]
+}
