@@ -68,7 +68,7 @@ def main():
             intersected_track_gdf = gp.GeoDataFrame({'geometry': [intersected_track]}, crs=EPSG_LOCAL)
 
             # Split the multi-line string into individual line strings
-            intersected_track_gdf = intersected_track_gdf.explode()
+            intersected_track_gdf = intersected_track_gdf.explode(index_parts=True)
 
             # Calculate statistics about the intersected track
             # Track length (TL) within segment
