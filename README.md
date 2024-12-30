@@ -61,9 +61,8 @@ After running the program, the console output shows the following:
 
     TL within segment: 4514.52 (m) | 14811 (ft)
     TTL within segment: 22572.61 (m) | 74057 (ft)
-    Area effectively searched: 790041.29 (m) | 2591998.99 (ft)
-    Coverage: 29.1%
-    Output written to .\output_intersected.geojson
+    Area effectively searched: 240804.59 (m) | 2591998.99 (ft)
+    Coverage: 8.87%
 
 Output file demo: 
 https://github.com/osajus/SAR_trim_tracks_within_segment/blob/main/output_intersected.geojson
