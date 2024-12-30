@@ -71,19 +71,31 @@ def main():
             intersected_track_gdf = intersected_track_gdf.explode()
 
             # Calculate statistics about the intersected track
-            tl = intersected_length
-            ttl = tl * SEARCHERS
-            aes = ttl * ESW
-            c = aes / segment.geometry.area
+            # Track length (TL) within segment
+            tl_m = intersected_length
+            tl_ft = tl_m * 3.280839895
+
+            # Total Track Length (TTL) or Effort (Z) = TL * Number of searchers
+            ttl_m = tl_m * SEARCHERS
+            ttl_ft = tl_ft * SEARCHERS
+
+            # Area effectively searched (AES) = TTL * Effective Sweep Width (ESW)
+            aes_m = ttl_m * (ESW / 3.280839895)
+            aes_ft = ttl_ft * ESW
+
+            area_sq_m = segment.geometry.area
+            area_sq_ft = segment.geometry.area * 10.7639104167
+            
+            c = aes_m / area_sq_m
 
             # Print the data to the console
-            print(f"TL within segment: {round(tl, 2)} (m) | {round(tl * 3.280839895)} (ft)")
-            print(f"TTL within segment: {round(ttl, 2)} (m) | {round(ttl * 3.280839895)} (ft)")
-            print(f"Area effectively searched: {round(aes,2)} (m) | {round(aes * 3.280839895, 2)} (ft)")
-            print(f"Coverage: {round(c * 100, 2)}%")
+            print(f"\r\nTL within segment: {round(tl_m, 2)} (m) | {round(tl_ft)} (ft)")
+            print(f"TTL within segment: {round(ttl_m, 2)} (m) | {round(ttl_ft)} (ft)")
+            print(f"Area effectively searched: {round(aes_m,2)} (m) | {round(aes_ft, 2)} (ft)")
+            print(f"Coverage: {round(c * 100, 2)}%\n\r")
 
             # Add the data to the 'description' column so it's imported back into SARTopo 
-            intersected_track_gdf['description'] = f"TL within segment: {round(tl, 2)} (m) | {round(tl * 3.280839895)} (ft)\nTTL within segment: {round(ttl, 2)} (m) | {round(ttl * 3.280839895)} (ft)\nArea effectively searched: {aes} (m) | {aes * 3.280839895} (ft)\nCoverage: {round(c * 100, 2)}%"
+            intersected_track_gdf['description'] = f"TL within segment: {round(tl_m, 2)} (m) | {round(tl_ft, 2)} (ft)\nTTL within segment: {round(ttl_m, 2)} (m) | {round(ttl_ft, 2)} (ft)\nArea effectively searched: {round(aes_m, 2)} (m) | {round(aes_ft, 2)} (ft)\nCoverage: {round(c * 100, 2)}%"
 
             # Retain the title of the search track
             i = 1 
