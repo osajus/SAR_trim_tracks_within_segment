@@ -1,6 +1,7 @@
 import geopandas as gp
 import pandas as pd
 import matplotlib.pyplot as plt
+import openpyxl
 from shapely.geometry import Point, LineString, Polygon
 
 ##### CHANGE THESE VARIABLES #####
@@ -10,9 +11,11 @@ from shapely.geometry import Point, LineString, Polygon
 EPSG_LOCAL = 32617 
 
 # Path and file name of the SARTopo export containing the segment and the search gps tracks
-# Use double backspaces in the path
+# Use double backspaces in the path.  i.e. "C:\\Users\\username\\Desktop\\"
 FILE_PATH = ".\\"
 FILE_NAME = "track-intersects.json"
+
+OUTPUT_FILE = "output_intersected.geojson"
 
 # Use Imperial units
 
@@ -80,8 +83,8 @@ def main():
             ttl_ft = tl_ft * SEARCHERS
 
             # Area effectively searched (AES) = TTL * Effective Sweep Width (ESW)
-            aes_m = ttl_m * (ESW / 3.280839895)
             aes_ft = ttl_ft * ESW
+            aes_m = ttl_m * (ESW / 3.280839895)
 
             area_sq_m = segment.geometry.area
             area_sq_ft = segment.geometry.area * 10.7639104167
@@ -91,11 +94,16 @@ def main():
             # Print the data to the console
             print(f"\r\nTL within segment: {round(tl_m, 2)} (m) | {round(tl_ft)} (ft)")
             print(f"TTL within segment: {round(ttl_m, 2)} (m) | {round(ttl_ft)} (ft)")
-            print(f"Area effectively searched: {round(aes_m,2)} (m) | {round(aes_ft, 2)} (ft)")
+            print(f"Area effectively searched: {round(aes_m, 2)} (m\u00b2) | {round(aes_ft, 2)} (ft\u00b2)")
             print(f"Coverage: {round(c * 100, 2)}%\n\r")
 
             # Add the data to the 'description' column so it's imported back into SARTopo 
             intersected_track_gdf['description'] = f"TL within segment: {round(tl_m, 2)} (m) | {round(tl_ft, 2)} (ft)\nTTL within segment: {round(ttl_m, 2)} (m) | {round(ttl_ft, 2)} (ft)\nArea effectively searched: {round(aes_m, 2)} (m) | {round(aes_ft, 2)} (ft)\nCoverage: {round(c * 100, 2)}%"
+
+            # For each line segment, print the line length
+            #for idx, row in intersected_track_gdf.iterrows():
+            #    print(f"Line {idx} length: {row.geometry.length}")
+
 
             # Retain the title of the search track
             i = 1 
@@ -103,6 +111,17 @@ def main():
                 intersected_track_gdf.at[idx, 'title'] = f"{track.title} - {segment.title}{i}"
                 i += 1
                 
+            
+            col1 = "Segment Name"
+            col2 =  "Segment Area"
+            col3 = "Searchers"
+            col4 = "TL"
+            col5 = "TTL"
+            col6 = "AES"
+            col7 = "Coverage"
+            data = pd.DataFrame({col1: "E", col2: "E" , col3: SEARCHERS, col4: round(tl_m, 2), col5: round(ttl_m, 2), col6: round(aes_m, 2), col7: round(c * 100, 2)}, index=[0])
+            data.to_excel("sample.xlsx", index=False)
+            #print(intersected_track_gdf)
         
             # Append this intersected track to the list of intersected tracks
             intersections.append(intersected_track_gdf)
@@ -119,7 +138,7 @@ def main():
 
     # Write the intersected tracks to a file
     intersections_gdf.to_crs(epsg=EPSG_WGS84).to_file(FILE_PATH + "\\output_intersected.geojson", driver='GeoJSON')
-    print(f"Output written to {FILE_PATH}output_intersected.geojson")
+    print(f"Output written to {FILE_PATH}{OUTPUT_FILE}")
 
 if __name__ == "__main__":
     main()
