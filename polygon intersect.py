@@ -158,7 +158,7 @@ def main():
                     i += 1
                     
                 # Create a random color for the intersected track and assign to the 'color' column
-                intersected_track_gdf['fill'] = "#%06x" % random.randint(0, 0xFFFFFF)
+                intersected_track_gdf['stroke'] = "#%06x" % random.randint(0, 0xFFFFFF)
 
                 # Append this intersected track to the list of intersected tracks
                 intersections.append(intersected_track_gdf)
