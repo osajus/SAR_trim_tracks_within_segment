@@ -3,12 +3,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import openpyxl
 import random
-from shapely.geometry import Point, LineString, Polygon
 
 ##### CHANGE THESE VARIABLES #####
 
 # Local spatial reference to the area of interest
 # Lookup here: https://spatialreference.org/ref/epsg/
+# Search for "WGS 84 / UTM zone <your UTM zone #>N"  N is for Northern Hemisphere
+# Example: WGS 84 / UTM zone 10N
 EPSG_LOCAL = 32617 
 
 # Path and file name of the SARTopo export containing the segment and the search gps tracks
@@ -57,6 +58,7 @@ def main():
     # Extract the search gps tracks
     search_tracks_gdf = import_gdf[import_gdf.geometry.geom_type == 'LineString']
     search_tracks_gdf = search_tracks_gdf[['title', 'geometry']]
+    search_tracks_gdf.set_index('title', inplace=True)
 
     # Create a list to hold the parts of the intersected search tracks
     intersections = []
@@ -75,13 +77,11 @@ def main():
             # Apply the fix to see the difference
             area_before = segment.geometry.area
             segment_new = segment.geometry.buffer(0)
-            area_after = segment.geometry.area
+            area_after = segment_new.area
 
             # Present the difference and ask if the user wants to continue
             print(f"     Area before: {area_before:.2f} | Area after: {area_after:.2f} | Delta: {(area_before - area_after) / area_before * 100:.2f}%")
-            #BUG - Change this back
-            #user_input = input(f"Do you want to and fix it? (Enter : Y or N) ")
-            user_input = 'y'
+            user_input = input(f"Do you want to and fix it? (Enter : Y or N) ")
 
             if user_input.lower() != 'y':
                 # If the user declines, skip this segment
@@ -95,11 +95,12 @@ def main():
             # If it's still not fixed, skip it
             print(f"Segment {segment.title} is still self-intersecting. Skipping.")
             continue
-                    
+        
         # Loop through each search track
         for track_idx, track in search_tracks_gdf.iterrows():
             # Intersect the search track with the segment
             intersected_track = track.geometry.intersection(segment.geometry)
+            
             # Get the length of the intersected track
             intersected_length = intersected_track.length
 
@@ -141,7 +142,7 @@ def main():
                 #intersected_track_gdf['description'] = f"TL within segment: {round(tl_m, 2)} (m) | {round(tl_ft, 2)} (ft)\nTTL within segment: {round(ttl_m, 2)} (m) | {round(ttl_ft, 2)} (ft)\nArea effectively searched: {round(aes_m, 2)} (m) | {round(aes_ft, 2)} (ft)\nCoverage: {round(c * 100, 2)}%"
                 
                 # Add the data row to the spreadsheet
-                new_spreadsheet_row = {"Segment Name": segment.title, "Segment Area": area_sq_m, "Searchers": SEARCHERS, "ESW (meters)": ESW, "TL (meters)": tl_m, "TTL (meters)": ttl_m, "AES (sq meters)": aes_m, "Coverage": c}
+                new_spreadsheet_row = {"Segment Name": segment.title, "Track Name": track_idx, "Segment Area": area_sq_m, "Searchers": SEARCHERS, "ESW (meters)": ESW, "TL (meters)": tl_m, "TTL (meters)": ttl_m, "AES (sq meters)": aes_m, "Coverage": c}
                 spreadsheet.append(new_spreadsheet_row)
                
                 # For each line segment, print the line length
@@ -154,7 +155,7 @@ def main():
                 for idx, row in intersected_track_gdf.iterrows():
                     # Track name (as imported), what segment it's in, and an incremental number
                     # This is to prevent duplicate track names
-                    intersected_track_gdf.at[idx, 'title'] = f"{track.title} - {segment.title}{i}"
+                    intersected_track_gdf.at[idx, 'title'] = f"{track_idx} - {segment_idx}{i}"
                     i += 1
                     
                 # Create a random color for the intersected track and assign to the 'color' column
@@ -165,7 +166,9 @@ def main():
             
     # Convert the list of data rows to a single DataFrame
     spreadsheet = pd.DataFrame(spreadsheet)
+    spreadsheet.sort_values(by=['Segment Name'], inplace=True)
     print("\r\n" + spreadsheet.to_string() + "\r\n")
+
 
     # Convert the list of intersected tracks to a single GeoDataFrame
     intersections_gdf = gp.GeoDataFrame(pd.concat(intersections), crs=EPSG_LOCAL)
